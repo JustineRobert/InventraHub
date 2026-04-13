@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 
 type LoginProps = {
   onLogin: () => void;
@@ -14,7 +14,7 @@ export default function Login({ onLogin }: LoginProps) {
     event.preventDefault();
     setError('');
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await api.post('/auth/login', { email, password });
       localStorage.setItem('inventrahub_token', response.data.token);
       onLogin();
     } catch (err) {

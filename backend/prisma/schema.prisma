@@ -160,6 +160,45 @@ model FileUpload {
   createdAt  DateTime @default(now())
 }
 
+model PrintableRecord {
+  id           String    @id @default(cuid())
+  order        Order?    @relation(fields: [orderId], references: [id])
+  orderId      String?
+  payment      Payment?  @relation(fields: [paymentId], references: [id])
+  paymentId    String?
+  business     Business  @relation(fields: [businessId], references: [id])
+  businessId   String
+  createdBy    User      @relation(fields: [createdById], references: [id])
+  createdById  String
+  recordType   String
+  title        String
+  content      String
+  format       String    @default("PDF")
+  printedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Transaction {
+  id           String   @id @default(cuid())
+  reference    String   @unique
+  order        Order?   @relation(fields: [orderId], references: [id])
+  orderId      String?
+  payment      Payment? @relation(fields: [paymentId], references: [id])
+  paymentId    String?
+  business     Business @relation(fields: [businessId], references: [id])
+  businessId   String
+  createdBy    User     @relation(fields: [createdById], references: [id])
+  createdById  String
+  type         String
+  amount       Float
+  currency     Currency @default(USD)
+  status       String
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model AuditLog {
   id        String   @id @default(cuid())
   action    String

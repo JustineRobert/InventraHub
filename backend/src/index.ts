@@ -1,11 +1,7 @@
-import dotenv from 'dotenv';
 import app from './app';
 import logger from './utils/logger';
+import config from './config';
 
-dotenv.config();
-
-const port = Number(process.env.PORT || 4000);
-
-app.listen(port, () => {
-  logger.info(`InventraHub backend running on http://localhost:${port}`);
+app.listen(config.port, () => {
+  logger.info(`InventraHub backend running on http://localhost:${config.port}`);
 });

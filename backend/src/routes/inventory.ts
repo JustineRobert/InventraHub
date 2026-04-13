@@ -16,13 +16,23 @@ const itemSchema = z.object({
   threshold: z.number().int().nonnegative().default(5),
   categoryId: z.string(),
   branchId: z.string().optional(),
-  businessId: z.string()
+  businessId: z.string().optional()
 });
 
 router.post('/', authGuard, roleGuard(['ADMIN', 'MANAGER']), async (req: AuthRequest, res, next) => {
   try {
     const payload = itemSchema.parse(req.body);
-    const item = await prisma.inventoryItem.create({ data: payload });
+    const businessId = req.user?.businessId || payload.businessId;
+    if (!businessId) {
+      return res.status(403).json({ error: 'Business scope is required' });
+    }
+
+    const item = await prisma.inventoryItem.create({
+      data: {
+        ...payload,
+        businessId
+      }
+    });
     return res.status(201).json(item);
   } catch (error) {
     next(error);
@@ -55,6 +65,12 @@ router.get('/low-stock', authGuard, async (req: AuthRequest, res, next) => {
 router.put('/:id', authGuard, roleGuard(['ADMIN', 'MANAGER']), async (req: AuthRequest, res, next) => {
   try {
     const payload = itemSchema.partial().parse(req.body);
+    const existing = await prisma.inventoryItem.findUnique({ where: { id: req.params.id } });
+    if (!existing) return res.status(404).json({ error: 'Inventory item not found' });
+    if (req.user?.businessId && existing.businessId !== req.user.businessId) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
     const item = await prisma.inventoryItem.update({ where: { id: req.params.id }, data: payload });
     return res.json(item);
   } catch (error) {
@@ -64,6 +80,8 @@ router.put('/:id', authGuard, roleGuard(['ADMIN', 'MANAGER']), async (req: AuthR
 
 router.delete('/:id', authGuard, roleGuard(['ADMIN']), async (req, res, next) => {
   try {
+    const existing = await prisma.inventoryItem.findUnique({ where: { id: req.params.id } });
+    if (!existing) return res.status(404).json({ error: 'Inventory item not found' });
     await prisma.inventoryItem.delete({ where: { id: req.params.id } });
     return res.status(204).send();
   } catch (error) {

@@ -24,7 +24,7 @@ npm run bootstrap
 2. Configure environment files:
 
 - `backend/.env.example` → `backend/.env`
-- `frontend/.env` if needed
+- `frontend/.env.example` → `frontend/.env`
 
 3. Start local development:
 

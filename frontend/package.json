@@ -7,7 +7,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "echo \"No frontend tests configured yet\""
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "axios": "^1.5.1",
@@ -16,6 +17,9 @@
     "react-router-dom": "^6.18.1"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.0.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/react-router-dom": "^5.3.3",
@@ -25,6 +29,8 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.33.2",
     "typescript": "^5.6.2",
-    "vite": "^5.5.1"
+    "vite": "^5.5.1",
+    "vitest": "^1.0.0",
+    "jsdom": "^22.0.0"
   }
 }

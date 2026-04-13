@@ -18,6 +18,8 @@ export default function NavBar({ authenticated, onLogout }: NavBarProps) {
           <Link to="/inventory" className={active('/inventory')}>Inventory</Link>
           <Link to="/orders" className={active('/orders')}>Orders</Link>
           <Link to="/payments" className={active('/payments')}>Payments</Link>
+          <Link to="/transactions" className={active('/transactions')}>Transactions</Link>
+          <Link to="/printables" className={active('/printables')}>Printables</Link>
           <Link to="/reports" className={active('/reports')}>Reports</Link>
           <button className="button secondary" onClick={onLogout} style={{ marginTop: 'auto' }}>
             Logout

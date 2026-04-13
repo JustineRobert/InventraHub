@@ -29,10 +29,24 @@ router.post('/', authGuard, roleGuard(['ADMIN', 'MANAGER']), async (req: AuthReq
   }
 });
 
-router.get('/', authGuard, async (_req, res, next) => {
+router.get('/', authGuard, async (req: AuthRequest, res, next) => {
   try {
-    const businesses = await prisma.business.findMany({ include: { branches: true, users: true } });
-    return res.json(businesses);
+    if (req.user?.role === 'ADMIN') {
+      const businesses = await prisma.business.findMany({ include: { branches: true, users: true } });
+      return res.json(businesses);
+    }
+
+    if (!req.user?.businessId) {
+      return res.status(403).json({ error: 'Business scope is required' });
+    }
+
+    const business = await prisma.business.findUnique({
+      where: { id: req.user.businessId },
+      include: { branches: true, users: true }
+    });
+
+    if (!business) return res.status(404).json({ error: 'Business not found' });
+    return res.json([business]);
   } catch (error) {
     next(error);
   }
@@ -40,6 +54,10 @@ router.get('/', authGuard, async (_req, res, next) => {
 
 router.put('/:id', authGuard, roleGuard(['ADMIN', 'MANAGER']), async (req: AuthRequest, res, next) => {
   try {
+    if (req.user?.role !== 'ADMIN' && req.user?.businessId !== req.params.id) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
     const payload = businessSchema.partial().parse(req.body);
     const business = await prisma.business.update({ where: { id: req.params.id }, data: payload });
     return res.json(business);

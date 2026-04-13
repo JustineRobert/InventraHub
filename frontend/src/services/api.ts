@@ -1,13 +1,6 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/api' });
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('inventrahub_token');
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+const baseURL = import.meta.env.VITE_API_BASE_URL || '/api';
+const api = axios.create({ baseURL, withCredentials: true });
 
 export default api;

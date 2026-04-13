@@ -18,10 +18,8 @@ services:
     command: npm run dev
     ports:
       - '4000:4000'
-    environment:
-      DATABASE_URL: postgres://inventra:inventra123@db:5432/inventra
-      JWT_SECRET: your_jwt_secret
-      NODE_ENV: development
+    env_file:
+      - ./backend/.env
     volumes:
       - ./backend:/app
       - /app/node_modules
