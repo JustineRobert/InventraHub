@@ -1,0 +1,7 @@
+import { NextFunction, Request, Response } from 'express';
+
+export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction) {
+  const message = err instanceof Error ? err.message : 'Unexpected error';
+  const stack = err instanceof Error ? err.stack : undefined;
+  res.status(500).json({ error: message, stack: process.env.NODE_ENV === 'development' ? stack : undefined });
+}

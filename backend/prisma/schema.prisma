@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  SALES
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  DELIVERED
+  CANCELLED
+}
+
+enum Currency {
+  UGX
+  KES
+  TZS
+  USD
+}
+
+model User {
+  id          String     @id @default(cuid())
+  email       String     @unique
+  name        String?
+  password    String
+  role        Role       @default(SALES)
+  business    Business?  @relation(fields: [businessId], references: [id])
+  businessId  String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  orders      Order[]
+}
+
+model Business {
+  id           String         @id @default(cuid())
+  name         String
+  location     String
+  currency     Currency       @default(USD)
+  contactEmail String
+  contactPhone String
+  logoUrl      String?
+  branches     Branch[]
+  users        User[]
+  inventory    InventoryItem[]
+  orders       Order[]
+  payments     Payment[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Branch {
+  id         String     @id @default(cuid())
+  name       String
+  address    String
+  business   Business   @relation(fields: [businessId], references: [id])
+  businessId String
+  inventory  InventoryItem[]
+}
+
+model Category {
+  id        String          @id @default(cuid())
+  name      String          @unique
+  items     InventoryItem[]
+  createdAt DateTime        @default(now())
+}
+
+model InventoryItem {
+  id             String     @id @default(cuid())
+  name           String
+  sku            String     @unique
+  serialNumber   String?
+  description    String?
+  purchaseCost   Float
+  sellingPrice   Float
+  quantity       Int        @default(0)
+  threshold      Int        @default(5)
+  category       Category   @relation(fields: [categoryId], references: [id])
+  categoryId     String
+  branch         Branch?    @relation(fields: [branchId], references: [id])
+  branchId       String?
+  business       Business   @relation(fields: [businessId], references: [id])
+  businessId     String
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model Customer {
+  id         String   @id @default(cuid())
+  name       String
+  email      String?
+  phone      String
+  orders     Order[]
+  createdAt  DateTime @default(now())
+}
+
+model Order {
+  id            String       @id @default(cuid())
+  reference     String       @unique
+  customer      Customer     @relation(fields: [customerId], references: [id])
+  customerId    String
+  business      Business     @relation(fields: [businessId], references: [id])
+  businessId    String
+  createdBy     User         @relation(fields: [createdById], references: [id])
+  createdById   String
+  status        OrderStatus  @default(PENDING)
+  subtotal      Float
+  tax           Float
+  discount      Float
+  total         Float
+  items         OrderItem[]
+  payments      Payment[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model OrderItem {
+  id             String        @id @default(cuid())
+  order          Order         @relation(fields: [orderId], references: [id])
+  orderId        String
+  inventoryItem  InventoryItem @relation(fields: [inventoryItemId], references: [id])
+  inventoryItemId String
+  quantity       Int
+  unitPrice      Float
+}
+
+model Payment {
+  id           String     @id @default(cuid())
+  order        Order      @relation(fields: [orderId], references: [id])
+  orderId      String
+  business     Business   @relation(fields: [businessId], references: [id])
+  businessId   String
+  method       String
+  provider     String
+  reference    String     @unique
+  amount       Float
+  currency     Currency   @default(USD)
+  status       String
+  receiptUrl   String?
+  createdAt    DateTime   @default(now())
+}
+
+model FileUpload {
+  id         String   @id @default(cuid())
+  filename   String
+  path       String
+  mimeType   String
+  uploadedBy User     @relation(fields: [uploadedById], references: [id])
+  uploadedById String
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String
+  createdAt  DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  detail    String?
+  userId    String
+  businessId String
+  createdAt DateTime @default(now())
+}

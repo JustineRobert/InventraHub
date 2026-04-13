@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Install package dependencies
+        run: npm install --workspaces
+      - name: Run lint and tests
+        run: |
+          if [ "${{ matrix.package }}" = "backend" ]; then
+            npm --workspace backend run lint && npm --workspace backend run test
+          else
+            npm --workspace frontend run lint && npm --workspace frontend run test
+          fi

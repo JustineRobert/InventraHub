@@ -1,0 +1,51 @@
+import { Router } from 'express';
+import { z } from 'zod';
+import prisma from '../utils/prisma';
+import { authGuard, roleGuard, AuthRequest } from '../middleware/auth';
+
+const router = Router();
+
+const businessSchema = z.object({
+  name: z.string().min(1),
+  location: z.string().min(1),
+  contactEmail: z.string().email(),
+  contactPhone: z.string().min(7),
+  currency: z.enum(['UGX', 'KES', 'TZS', 'USD']).optional(),
+  logoUrl: z.string().url().optional()
+});
+
+router.post('/', authGuard, roleGuard(['ADMIN', 'MANAGER']), async (req: AuthRequest, res, next) => {
+  try {
+    const payload = businessSchema.parse(req.body);
+    const business = await prisma.business.create({
+      data: {
+        ...payload,
+        currency: payload.currency || 'USD'
+      }
+    });
+    return res.status(201).json(business);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/', authGuard, async (_req, res, next) => {
+  try {
+    const businesses = await prisma.business.findMany({ include: { branches: true, users: true } });
+    return res.json(businesses);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put('/:id', authGuard, roleGuard(['ADMIN', 'MANAGER']), async (req: AuthRequest, res, next) => {
+  try {
+    const payload = businessSchema.partial().parse(req.body);
+    const business = await prisma.business.update({ where: { id: req.params.id }, data: payload });
+    return res.json(business);
+  } catch (error) {
+    next(error);
+  }
+});
+
+export default router;
