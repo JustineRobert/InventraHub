@@ -13,12 +13,16 @@ import inventoryRoutes from './routes/inventory';
 import ordersRoutes from './routes/orders';
 import paymentsRoutes from './routes/payments';
 import reportsRoutes from './routes/reports';
+import branchesRoutes from './routes/branches';
+import notificationsRoutes from './routes/notifications';
+import forecastRoutes from './routes/forecast';
 import uploadRoutes from './routes/upload';
 import printableRoutes from './routes/printables';
 import transactionRoutes from './routes/transactions';
 import { errorHandler } from './middleware/errorHandler';
 import logger from './utils/logger';
 import config from './config';
+import { startAnalyticsAggregationService } from './services/analytics';
 
 const app = express();
 
@@ -52,9 +56,16 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/branches', branchesRoutes);
+app.use('/api/notifications', notificationsRoutes);
+app.use('/api/forecast', forecastRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/printables', printableRoutes);
 app.use('/api/uploads', uploadRoutes);
+
+if (config.nodeEnv !== 'test') {
+  startAnalyticsAggregationService();
+}
 
 if (config.nodeEnv === 'production') {
   const clientApp = path.resolve('public');

@@ -45,6 +45,7 @@ model Business {
   name         String
   location     String
   currency     Currency       @default(USD)
+  taxRate      Float?         
   contactEmail String
   contactPhone String
   logoUrl      String?
@@ -109,6 +110,8 @@ model Order {
   customerId    String
   business      Business     @relation(fields: [businessId], references: [id])
   businessId    String
+  branch        Branch?      @relation(fields: [branchId], references: [id])
+  branchId      String?
   createdBy     User         @relation(fields: [createdById], references: [id])
   createdById   String
   status        OrderStatus  @default(PENDING)
@@ -116,6 +119,7 @@ model Order {
   tax           Float
   discount      Float
   total         Float
+  currency      Currency     @default(USD)
   items         OrderItem[]
   payments      Payment[]
   createdAt     DateTime     @default(now())

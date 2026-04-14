@@ -39,14 +39,18 @@ npm run dev
 
 The scaffold includes:
 
-- API security with JWT, rate limiting, helmet, CORS
-- Role-based access control
-- Modular service architecture
-- File upload handling
+- API security with JWT, cookie-based authentication, rate limiting, helmet, and CORS
+- Role-based access control and business-scoped data isolation
+- Transaction tracking and printable record auditing support
+- Modular service architecture and secure file uploads
 - Mobile money integration hooks
-- Responsive React admin dashboard
+- Responsive React admin dashboard with session verification
 - CI workflow and lint/test scripts
-- Docker support for cloud-ready deployment
+- Production Dockerfile and local `docker-compose.yml` support
+
+## Docker Deployment
+
+A root `Dockerfile` is provided for production container builds. Use it to build the app and serve the backend API in production mode.
 
 ## Notes
 

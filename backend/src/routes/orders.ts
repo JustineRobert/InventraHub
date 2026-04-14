@@ -17,6 +17,8 @@ const orderSchema = z.object({
   items: z.array(orderItemSchema).min(1),
   tax: z.number().nonnegative().default(0),
   discount: z.number().nonnegative().default(0),
+  currency: z.enum(['UGX', 'KES', 'TZS', 'USD']).optional(),
+  branchId: z.string().optional(),
   businessId: z.string().optional()
 });
 
@@ -40,17 +42,21 @@ router.post('/', authGuard, roleGuard(['ADMIN', 'MANAGER', 'SALES']), async (req
     const subtotal = payload.items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0);
     const total = subtotal + payload.tax - payload.discount;
 
+    const currency = payload.currency || 'USD';
+
     const order = await prisma.order.create({
       data: {
         reference: payload.reference,
         customerId: customer.id,
         businessId,
+        branchId: payload.branchId,
         createdById: req.user!.id,
         status: 'PENDING',
         subtotal,
         tax: payload.tax,
         discount: payload.discount,
         total,
+        currency,
         items: { create: payload.items }
       },
       include: { customer: true, items: true }
@@ -64,7 +70,7 @@ router.post('/', authGuard, roleGuard(['ADMIN', 'MANAGER', 'SALES']), async (req
         createdById: req.user!.id,
         type: 'ORDER',
         amount: total,
-        currency: 'USD',
+        currency,
         status: 'PENDING',
         metadata: { items: order.items.length }
       }

@@ -18,6 +18,10 @@ export default function NavBar({ authenticated, onLogout }: NavBarProps) {
           <Link to="/inventory" className={active('/inventory')}>Inventory</Link>
           <Link to="/orders" className={active('/orders')}>Orders</Link>
           <Link to="/payments" className={active('/payments')}>Payments</Link>
+          <Link to="/pos" className={active('/pos')}>POS</Link>
+          <Link to="/branches" className={active('/branches')}>Branches</Link>
+          <Link to="/forecast" className={active('/forecast')}>Forecast</Link>
+          <Link to="/notifications" className={active('/notifications')}>Notifications</Link>
           <Link to="/transactions" className={active('/transactions')}>Transactions</Link>
           <Link to="/printables" className={active('/printables')}>Printables</Link>
           <Link to="/reports" className={active('/reports')}>Reports</Link>

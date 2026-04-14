@@ -11,6 +11,7 @@ const businessSchema = z.object({
   contactEmail: z.string().email(),
   contactPhone: z.string().min(7),
   currency: z.enum(['UGX', 'KES', 'TZS', 'USD']).optional(),
+  taxRate: z.number().min(0).max(1).optional(),
   logoUrl: z.string().url().optional()
 });
 
